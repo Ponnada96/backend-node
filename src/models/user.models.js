@@ -55,7 +55,7 @@ userSchema.pre('save', async function (next) {
 
 userSchema.methods.isPasswordValid = async function
     (password) {
-    return bycrypt.compare(password, this.password)
+    return await bycrypt.compare(password, this.password)
 }
 
 userSchema.methods.generateAccessToken = function () {
