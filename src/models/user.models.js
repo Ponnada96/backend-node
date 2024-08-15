@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import bycrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-
+import aggregatePaginate from 'mongoose-aggregate-paginate-v2'
 const userSchema = new Schema({
     username: {
         type: String,
@@ -49,7 +49,7 @@ userSchema.plugin(aggregatePaginate);
 userSchema.pre('save', async function (next) {
     if (!this.isModified("password")) return next()
 
-    this.password = bycrypt.hash(password, 10);
+    this.password = await bycrypt.hash(this.password, 10);
     next()
 });
 
