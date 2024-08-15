@@ -74,10 +74,7 @@ userSchema.methods.generateAccessToken = function () {
 
 userSchema.methods.generateRefreshToken = function () {
     const token = jwt.sign({
-        id: this._id,
-        username: this.username,
-        email: this.email,
-        fullname: this.fullname
+        id: this._id, 
     }, process.env.REFRESHTOKEN_SECRET,
         {
             expiresIn: process.env.REFRESHTOKEN_EXPIRY
