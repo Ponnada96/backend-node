@@ -3,6 +3,7 @@ import {
     changePassword,
     getUser,
     getUserChanneInfo,
+    getUserVideoHistory,
     loginUser,
     logoutUser,
     refreshAccessToken,
@@ -14,6 +15,7 @@ import {
 import { upload } from "../middlewares/multer.middleware.js";
 import { validateJwt } from "../middlewares/auth.middleware.js";
 import { addSubscription } from "../controllers/subscription.controller.js";
+import { uploadVideo } from "../controllers/video.controller.js";
 const router = Router();
 
 router.route("/Register").post(
@@ -34,14 +36,14 @@ router.route("/refresh-token").post(refreshAccessToken);
 router.route("/logout").post(validateJwt, logoutUser);
 router.route("/changePassword").post(validateJwt, changePassword);
 router.route("/getUser").post(validateJwt, getUser);
-router.route("/updateUser").post(validateJwt, updateUser);
+router.route("/updateUser").patch(validateJwt, updateUser);
 
-router.route("/updateAvater").post(
+router.route("/updateAvater").patch  (
     validateJwt,
     upload.single("avatar"),
     updateAvatar);
 
-router.route("/updateCoverImage").post(
+router.route("/updateCoverImage").patch(
     validateJwt,
     upload.single("coverImage"),
     updateCoverImage);
@@ -52,4 +54,10 @@ router.route("/subscribe").post(validateJwt,
 router.route("/channelInfo/:username")
     .get(validateJwt, getUserChanneInfo);
 
+router.route("/uploadVideo").post(validateJwt,
+    uploadVideo)
+
+router.route("/videoHistory").get(validateJwt,
+    getUserVideoHistory
+)
 export default router;
