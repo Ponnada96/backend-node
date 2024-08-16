@@ -363,7 +363,6 @@ const getUserChanneInfo = asynHandler(async (req, res) => {
         }
 
     ])
-    console.log(userInfo);
     return res
         .status(200)
         .json(
@@ -371,10 +370,61 @@ const getUserChanneInfo = asynHandler(async (req, res) => {
                 (
                     200,
                     "Userinfo fetched successfully",
-                    userInfo
+                    userInfo[0]
                 )
         )
 });
+
+const getUserVideoHistory = asynHandler(async (req, res) => {
+    const user = await User.aggregate([
+        {
+            $match: {
+                _id: req.user?._id
+            }
+        },
+        {
+            $lookup: {
+                from: "videos",
+                localField: "watchHistory",
+                foreignField: "_id",
+                as: "watchHistory",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "users",
+                            foreignField: "_id",
+                            localField: "owner",
+                            as: "owner",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        fullname: 1,
+                                        username: 1,
+                                        avatar: 1
+                                    }
+                                }
+                            ]
+                        },
+
+                    },
+                    {
+                        $addFields: {
+                            owner: {
+                                $first: "$owner"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ])
+    return res
+        .status(200)
+        .json(new ApiResponse(200,
+            "Fetched watch history successfully",
+            user[0].watchHistory
+        ))
+})
 
 export {
     registerUser,
@@ -386,5 +436,6 @@ export {
     updateUser,
     updateAvatar,
     updateCoverImage,
-    getUserChanneInfo
+    getUserChanneInfo,
+    getUserVideoHistory
 }
