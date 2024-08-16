@@ -183,12 +183,10 @@ const refreshAccessToken = asynHandler(async (req, res) => {
 const changePassword = asynHandler(async (req, res) => {
     const { currentPassword, newPassword, confirmPassword } = req.body;
     if (!(currentPassword || newPassword || confirmPassword)) {
-        throw new ApiError(`currentPassword, newPassWord,
-            confirmPassword are requied!`, 400);
+        throw new ApiError('currentPassword, newPassWord,confirmPassword are requied!', 400);
     }
     if (!(newPassword === confirmPassword)) {
-        throw new ApiError(`newPassWord,
-            confirmPassword are not same!`, 400);
+        throw new ApiError(`newPassWord,confirmPassword are not same!`, 400);
     }
     const user = await User.findById(req.user?._id);
     const isValidPassword = await
@@ -269,7 +267,7 @@ const updateAvatar = asynHandler(async (req, res) => {
 
     return res
         .status(200)
-        .body(new ApiResponse(
+        .json(new ApiResponse(
             200,
             "Avatar Uploaded Successfully",
             user
@@ -301,7 +299,7 @@ const updateCoverImage = asynHandler(async (req, res) => {
 
     return res
         .status(200)
-        .body(new ApiResponse(
+        .json(new ApiResponse(
             200,
             "coverImage Uploaded Successfully",
             user
