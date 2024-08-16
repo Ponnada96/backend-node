@@ -306,6 +306,76 @@ const updateCoverImage = asynHandler(async (req, res) => {
         ))
 });
 
+const getUserChanneInfo = asynHandler(async (req, res) => {
+    const { username } = req.params;
+    if (!username?.trim()) {
+        throw new ApiError("username is missing", 400);
+    }
+
+    const userInfo = await User.aggregate([
+        {
+            $match: {
+                username: username?.toLowerCase()
+            }
+        },
+        {
+            $lookup: {
+                from: "subscriptions",
+                localField: "_id",
+                foreignField: "channel",
+                as: "Subscribers"
+            }
+        },
+        {
+            $lookup: {
+                from: "subscriptions",
+                localField: "_id",
+                foreignField: "subscriber",
+                as: "SubscribedTo"
+            }
+        },
+        {
+            $addFields: {
+                subscribersCount: {
+                    $size: "$Subscribers"
+                },
+                channelsSubscribedToCount: {
+                    $size: "$SubscribedTo"
+                },
+                isSubsribed: {
+                    $cond: {
+                        if: { $in: [req.user?._id, "$Subscribers.subscriber"] },
+                        then: true,
+                        else: false
+                    }
+                }
+            }
+        }, {
+            $project: {
+                fullname: -1,
+                username: -1,
+                subscribersCount: -1,
+                channelsSubscribedToCount: -1,
+                isSubsribed: -1,
+                avatar: -1,
+                coverImage: -1
+            }
+        }
+
+    ])
+    console.log(userInfo);
+    return res
+        .status(200)
+        .json(
+            new ApiResponse
+                (
+                    200,
+                    "Userinfo fetched successfully",
+                    userInfo
+                )
+        )
+});
+
 export {
     registerUser,
     loginUser,
@@ -315,5 +385,6 @@ export {
     getUser,
     updateUser,
     updateAvatar,
-    updateCoverImage
+    updateCoverImage,
+    getUserChanneInfo
 }

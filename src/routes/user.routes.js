@@ -2,6 +2,7 @@ import { Router } from "express"
 import {
     changePassword,
     getUser,
+    getUserChanneInfo,
     loginUser,
     logoutUser,
     refreshAccessToken,
@@ -12,6 +13,7 @@ import {
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { validateJwt } from "../middlewares/auth.middleware.js";
+import { addSubscription } from "../controllers/subscription.controller.js";
 const router = Router();
 
 router.route("/Register").post(
@@ -43,4 +45,11 @@ router.route("/updateCoverImage").post(
     validateJwt,
     upload.single("coverImage"),
     updateCoverImage);
+
+router.route("/subscribe").post(validateJwt,
+    addSubscription);
+
+router.route("/channelInfo/:username")
+    .get(validateJwt, getUserChanneInfo);
+
 export default router;
